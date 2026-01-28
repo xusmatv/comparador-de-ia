@@ -1,167 +1,3158 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Comparador IA – HART vs Modelos Gratis</title>
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<style>
-  body{font-family:system-ui,sans-serif;background:#fafafa;padding:2rem}
-  .container{max-width:1100px;margin:auto}
-  textarea{width:100%;height:100px;padding:.6rem;font-size:1rem}
-  .models{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-          gap:.8rem;margin:1rem 0}
-  .model{display:flex;align-items:center}
-  .model input{margin-right:.4rem}
-  .result{border:1px solid #ddd;padding:.8rem;margin-top:1rem;
-          border-radius:.4rem;background:#fff}
-  .spinner{border:4px solid #eee;border-top:4px solid #667eea;
-          border-radius:50%;width:36px;height:36px;
-          animation:spin 1s linear infinite;margin:auto}
-  @keyframes spin{to{transform:rotate(360deg)}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Arena - Comparador de Modelos de IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --bg-card-hover: #222230;
+            --border-color: #2a2a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-purple: #8b5cf6;
+            --accent-purple-dark: #7c3aed;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-pink: #ec4899;
+            --accent-red: #ef4444;
+            --gradient-1: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            --gradient-2: linear-gradient(135deg, #ec4899, #8b5cf6);
+            --gradient-3: linear-gradient(135deg, #10b981, #3b82f6);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            padding: 0.25rem;
+            border-radius: 12px;
+        }
+
+        .nav-tab {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .api-keys-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .api-keys-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-purple);
+        }
+
+        /* Quick Login Panel Styles */
+        .quick-login-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-login-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .quick-login-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .quick-login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .service-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .service-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: var(--bg-card);
+        }
+
+        .service-icon img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        .service-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .service-models {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .service-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .service-status.connected {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .service-status.disconnected {
+            background: rgba(107, 114, 128, 0.15);
+            color: var(--text-muted);
+        }
+
+        .service-status.pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: auto;
+        }
+
+        .service-btn {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            border: none;
+        }
+
+        .service-btn.google-auth {
+            background: white;
+            color: #333;
+        }
+
+        .service-btn.google-auth:hover {
+            background: #f0f0f0;
+        }
+
+        .service-btn.google-auth img {
+            width: 14px;
+            height: 14px;
+        }
+
+        .service-btn.manual-auth {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .service-btn.manual-auth:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .service-btn.disconnect {
+            background: transparent;
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        .service-btn.disconnect:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .google-benefits {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1));
+            border: 1px solid rgba(66, 133, 244, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .google-benefits h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .google-benefits p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .oauth-window-notice {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .oauth-window-notice i {
+            color: var(--accent-blue);
+            margin-top: 2px;
+        }
+
+        .connected-accounts-summary {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+
+        .connected-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.625rem;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--accent-green);
+        }
+
+        .connected-badge img {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        /* Google Sign-In Styles */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .google-login-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .google-login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .google-login-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.375rem;
+            padding-right: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-purple);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-purple);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .user-email {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.2;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.5rem;
+            min-width: 200px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 1001;
+            display: none;
+        }
+
+        .user-dropdown.active {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .user-dropdown-item:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .user-dropdown-item.logout {
+            color: var(--accent-red);
+        }
+
+        .user-dropdown-item.logout:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .user-profile-container {
+            position: relative;
+        }
+
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            color: var(--accent-green);
+            margin-top: 0.25rem;
+        }
+
+        .sync-indicator::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .login-prompt-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .login-prompt-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .login-prompt-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .login-prompt-benefits {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .login-benefit {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .welcome-message {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .welcome-message img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+        }
+
+        .welcome-text h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .welcome-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .prompt-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .prompt-input-wrapper {
+            position: relative;
+        }
+
+        .prompt-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            padding-right: 120px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            resize: none;
+            min-height: 80px;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        .prompt-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        .prompt-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .generate-btn {
+            position: absolute;
+            right: 0.75rem;
+            bottom: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .categories {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .category-badge.free {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .category-badge.beta {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-orange);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .category-badge.community {
+            background: rgba(236, 72, 153, 0.15);
+            color: var(--accent-pink);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+
+        .category-badge.api-key {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .category-badge:hover,
+        .category-badge.active {
+            transform: scale(1.05);
+        }
+
+        .category-badge.active {
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .models-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .model-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .model-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+        }
+
+        .model-card:hover::before {
+            opacity: 1;
+        }
+
+        .model-card.selected {
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .model-card.selected::before {
+            opacity: 1;
+        }
+
+        .model-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .model-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .model-provider {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .model-type-badge {
+            font-size: 0.65rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .model-type-badge.free { background: var(--accent-green); color: white; }
+        .model-type-badge.beta { background: var(--accent-orange); color: white; }
+        .model-type-badge.community { background: var(--accent-pink); color: white; }
+        .model-type-badge.api-key { background: var(--accent-purple); color: white; }
+
+        .model-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .model-stat {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .model-stat span {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .model-checkbox {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .model-card.selected .model-checkbox {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .model-checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .model-card.selected .model-checkbox::after {
+            opacity: 1;
+        }
+
+        .results-section {
+            margin-top: 2rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .result-image-container {
+            position: relative;
+            aspect-ratio: 1;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .result-placeholder {
+            color: var(--text-muted);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .result-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-info {
+            padding: 1.25rem;
+        }
+
+        .result-model-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .result-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .result-stat-icon {
+            font-size: 1rem;
+        }
+
+        .result-stat-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .result-stat.fast .result-stat-value { color: var(--accent-green); }
+        .result-stat.medium .result-stat-value { color: var(--accent-orange); }
+        .result-stat.slow .result-stat-value { color: var(--accent-red); }
+
+        .comparison-table {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .comparison-table td {
+            font-size: 0.875rem;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover td {
+            background: var(--bg-card-hover);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb700); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #b87333); color: #fff; }
+        .rank-other { background: var(--bg-secondary); color: var(--text-secondary); }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .api-key-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .api-key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .api-key-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-key-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .api-key-status.configured {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .api-key-status.missing {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        .api-key-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .api-key-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-family: monospace;
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        .api-key-save {
+            padding: 0.75rem 1rem;
+            background: var(--accent-purple);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .api-key-save:hover {
+            background: var(--accent-purple-dark);
+        }
+
+        .api-key-delete {
+            padding: 0.75rem;
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            color: var(--accent-red);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .api-key-delete:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .api-key-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .leaderboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s ease;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .leaderboard-rank {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 600;
+        }
+
+        .leaderboard-provider {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .leaderboard-score {
+            text-align: right;
+        }
+
+        .leaderboard-score-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .leaderboard-score-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .history-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .history-prompt {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-style: italic;
+        }
+
+        .history-images {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .history-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .history-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                order: 1;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .models-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.success { border-color: var(--accent-green); }
+        .toast.error { border-color: var(--accent-red); }
+        .toast.info { border-color: var(--accent-blue); }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .selection-counter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .selection-count {
+            background: var(--accent-purple);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .clear-selection {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .clear-selection:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+    </style>
 </head>
-
 <body>
-<div class="container">
-  <h1>🔄 Comparador IA – HART vs Modelos Gratis</h1>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🎨</div>
+                <span class="logo-text">AI Image Arena</span>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="compare">⚡ Comparar</button>
+                <button class="nav-tab" data-tab="accounts">🔗 Cuentas IA</button>
+                <button class="nav-tab" data-tab="leaderboard">🏆 Ranking</button>
+                <button class="nav-tab" data-tab="history">📜 Historial</button>
+            </nav>
+            <div class="header-right">
+                <button class="api-keys-btn" onclick="openApiModal()">
+                    🔑 API Keys
+                </button>
+                
+                <!-- Google Sign-In Area -->
+                <div id="authContainer">
+                    <!-- Login Button (shown when not logged in) -->
+                    <button class="google-login-btn" id="googleLoginBtn" onclick="handleGoogleLogin()">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                        Iniciar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-  <!-- Prompt --------------------------------------------------- -->
-  <label for="prompt">📝 Prompt (español o inglés)</label>
-  <textarea id="prompt"
-    placeholder="Ej.: un astronauta montado en un caballo sobre la luna, estilo Van Gogh"></textarea>
+    <main class="main-container">
+        <div class="tab-content active" id="compare-tab">
+            <div id="loginPromptArea"></div>
 
-  <!-- Selección de modelos ------------------------------------- -->
-  <div class="models">
-    <div class="model"><input type="checkbox" id="m_hart" checked>
-      <label for="m_hart">HART (Replicate)</label></div>
-    <div class="model"><input type="checkbox" id="m_sd" checked>
-      <label for="m_sd">Stable‑Diffusion 2‑1 (HF‑Space)</label></div>
-    <div class="model"><input type="checkbox" id="m_pixart" checked>
-      <label for="m_pixart">PixArt‑α (HF‑Space)</label></div>
-    <div class="model"><input type="checkbox" id="m_sdxl" checked>
-      <label for="m_sdxl">SD‑XL‑Turbo (HF‑Space)</label></div>
-    <div class="model"><input type="checkbox" id="m_dalle">
-      <label for="m_dalle">DALL·E 3 (OpenAI‑pago)</label></div>
-  </div>
+            <div class="hero">
+                <h1>Compara Modelos de IA</h1>
+                <p>Genera imágenes con múltiples modelos simultáneamente y compara su velocidad y calidad</p>
+            </div>
 
-  <!-- Resolución ---------------------------------------------- -->
-  <label for="size">📏 Resolución</label>
-  <select id="size">
-    <option value="512x512">512 × 512 (rápido)</option>
-    <option value="1024x1024" selected>1024 × 1024 (alta calidad)</option>
-  </select>
+            <div class="prompt-section">
+                <div class="prompt-header">
+                    <h3>✨ Describe tu imagen</h3>
+                </div>
+                <div class="prompt-input-wrapper">
+                    <textarea 
+                        class="prompt-input" 
+                        id="promptInput"
+                        placeholder="Ejemplo: Un astronauta cabalgando un caballo en la luna, estilo fotorealista..."
+                    ></textarea>
+                    <button class="generate-btn" id="generateBtn" onclick="generateImages()">
+                        🚀 Generar
+                    </button>
+                </div>
+            </div>
 
-  <br><br>
-  <button id="genBtn"
-    style="padding:.6rem 1rem;font-size:1rem;background:#667eea;color:#fff;
-           border:none;border-radius:.4rem;cursor:pointer">
-    🚀 Generar
-  </button>
-  <div id="loader" class="spinner" style="display:none;margin-top:1rem"></div>
+            <div class="categories" id="categoriesFilter">
+                <span class="category-badge free active" data-category="all">📦 Todos</span>
+                <span class="category-badge free" data-category="free">✅ Free Tier</span>
+                <span class="category-badge beta" data-category="beta">🧪 Beta / Dev</span>
+                <span class="category-badge community" data-category="community">👥 Comunitarios</span>
+                <span class="category-badge api-key" data-category="api-key">🔑 Con API Key</span>
+            </div>
 
-  <!-- Área donde aparecen los resultados -->
-  <div id="results"></div>
-</div>
+            <div class="models-section">
+                <div class="section-header">
+                    <h2 class="section-title">Selecciona Modelos</h2>
+                    <div class="selection-counter" id="selectionCounter" style="display: none;">
+                        <span class="selection-count" id="selectedCount">0 seleccionados</span>
+                        <button class="clear-selection" onclick="clearSelection()">Limpiar</button>
+                    </div>
+                </div>
+                <div class="models-grid" id="modelsGrid"></div>
+            </div>
 
-<!-- ========================================================= -->
-<script>
-/* ---------- 1️⃣ URLs públicas (sin token) ---------- */
-const IF_RAMES = {
-  hart:    {url:"https://replicate.com/chenxwh/hart?embed=true",   name:"HART (Replicate)"},
-  sd:      {url:"https://stabilityai-stable-diffusion-2-1.hf.space",name:"Stable‑Diffusion 2‑1"},
-  pixart:  {url:"https://pixart-alpha-pixart-alpha.hf.space",  name:"PixArt‑α"},
-  sdxl:    {url:"https://stabilityai-sdxl-turbo.hf.space",    name:"SD‑XL‑Turbo"},
-  // ----------------- Añade aquí más modelos -----------------
-  sd3_5:   {url:"https://stabilityai-stable-diffusion-3-5-large.hf.space", name:"Stable‑Diffusion 3.5 Large"},
-  // …
-};
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2 class="section-title">🖼️ Resultados</h2>
+                </div>
+                <div class="results-grid" id="resultsGrid"></div>
 
-/* ---------- 2️⃣ Embed iframe (para todos los Spaces) ---------- */
-async function embedIframe(key, prompt, size){
-  const container = document.createElement('div'); container.className='result';
-  const title = document.createElement('h3'); title.textContent = IF_RAMES[key].name;
-  container.appendChild(title);
-  const [w, h] = size.split('x');
-  const src = `${IF_RAMES[key].url}?prompt=${encodeURIComponent(prompt)}&width=${w}&height=${h}`;
-  const iframe = document.createElement('iframe');
-  iframe.src = src; iframe.style.width='100%'; iframe.style.height='620px';
-  iframe.setAttribute('loading','lazy'); iframe.setAttribute('allowfullscreen','');
-  container.appendChild(iframe);
-  document.getElementById('results').appendChild(container);
-}
+                <div class="comparison-table" id="comparisonTable" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Posición</th>
+                                <th>Modelo</th>
+                                <th>Tiempo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-/* ---------- 3️⃣ Pollinations (fallback gratuito) ---------- */
-async function pollinationsGenerate(prompt,size){
-  const [w,h]=size.split('x');
-  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true`;
-  const start=performance.now();
-  const resp=await fetch(url);
-  const blob=await resp.blob();
-  const img=URL.createObjectURL(blob);
-  const t=((performance.now()-start)/1000).toFixed(2);
-  const card=document.createElement('div'); card.className='result';
-  card.innerHTML = `<h3>Pollinations (free fallback)</h3>
-                    <img src="${img}" style="max-width:100%;border-radius:.4rem;">
-                    <p>⏱ Tiempo: <strong>${t}s</strong></p>
-                    <a href="${img}" download="pollinations.png"
-                       class="btn-download"><i class="fas fa-download"></i> Descargar</a>`;
-  document.getElementById('results').appendChild(card);
-}
+        <div class="tab-content" id="accounts-tab">
+            <div class="hero">
+                <h1>🔗 Gestión de Cuentas IA</h1>
+                <p>Conecta tus cuentas de servicios de IA para desbloquear todos los modelos</p>
+            </div>
+            
+            <div class="quick-login-panel" id="quickLoginPanel">
+                <div class="quick-login-header">
+                    <h3><i class="fab fa-google" style="color: #4285f4;"></i> Inicio Rápido con Google</h3>
+                    <div id="connectedSummary"></div>
+                </div>
+                <p class="quick-login-subtitle">
+                    Muchos servicios de IA permiten iniciar sesión con tu cuenta de Google. 
+                    Haz clic en cada servicio para autenticarte rápidamente.
+                </p>
+                
+                <div class="services-grid" id="servicesGrid"></div>
+                
+                <div class="google-benefits">
+                    <h4><i class="fas fa-magic"></i> ¿Cómo funciona?</h4>
+                    <p>
+                        Al hacer clic en "Iniciar con Google" se abrirá una ventana del servicio de IA. 
+                        Si ya tienes sesión activa con Google, el inicio será automático. 
+                        Una vez conectado, podrás generar imágenes con ese modelo directamente desde nuestra plataforma.
+                    </p>
+                </div>
+                
+                <div class="oauth-window-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Las ventanas emergentes deben estar habilitadas. El inicio de sesión se realiza directamente 
+                    en la página oficial de cada servicio, garantizando la seguridad de tus credenciales.</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="leaderboard-tab">
+            <div class="hero">
+                <h1>🏆 Ranking de Modelos</h1>
+                <p>Los modelos más rápidos y con mejor calidad según las comparativas realizadas</p>
+            </div>
+            <div class="leaderboard-card" id="leaderboardCard"></div>
+        </div>
 
-/* ---------- 4️⃣ DALL·E 3 (pago) ---------- */
-const OPENAI_KEY = "";   // <-- pon tu clave si la tienes
-async function openAIDALLE3(prompt,size){
-  if(!OPENAI_KEY) return;
-  const [w,h]=size.split('x');
-  const start=performance.now();
-  const resp = await fetch('https://api.openai.com/v1/images/generations',{
-    method:'POST',
-    headers:{'Authorization':`Bearer ${OPENAI_KEY}`,'Content-Type':'application/json'},
-    body:JSON.stringify({model:'dall-e-3',prompt,size:`${w}x${h}`})
-  });
-  const data = await resp.json();
-  const img = data.data[0].url;
-  const t=((performance.now()-start)/1000).toFixed(2);
-  const card=document.createElement('div'); card.className='result';
-  card.innerHTML = `<h3>DALL·E 3 (OpenAI‑pago)</h3>
-                    <img src="${img}" style="max-width:100%;border-radius:.4rem;">
-                    <p>⏱ Tiempo: <strong>${t}s</strong></p>
-                    <a href="${img}" download="dalle3.png"
-                       class="btn-download"><i class="fas fa-download"></i> Descargar</a>`;
-  document.getElementById('results').appendChild(card);
-}
+        <div class="tab-content" id="history-tab">
+            <div class="hero">
+                <h1>📜 Historial</h1>
+                <p>Tus generaciones anteriores</p>
+            </div>
+            <div id="historyContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🕐</div>
+                    <div class="empty-state-title">Sin historial</div>
+                    <p>Las imágenes generadas aparecerán aquí</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
-/* ---------- 5️⃣ Botón “Generar” (orquesta todo) ---------- */
-document.getElementById('genBtn').onclick = async () => {
-  const prompt = document.getElementById('prompt').value.trim();
-  const size   = document.getElementById('size').value;
-  if(!prompt){ alert('Introduce un prompt'); return; }
+    <div class="modal-overlay" id="apiModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">🔑 Configurar API Keys</h2>
+                <button class="modal-close" onclick="closeApiModal()">×</button>
+            </div>
+            <div class="modal-body" id="apiModalBody"></div>
+        </div>
+    </div>
 
-  document.getElementById('results').innerHTML = '';
-  document.getElementById('loader').style.display = 'block';
+    <div class="toast-container" id="toastContainer"></div>
 
-  const jobs = [];
-  // Cada modelo que tenga el checkbox marcado se agrega aquí:
-  if(document.getElementById('m_hart').checked)    jobs.push(embedIframe('hart',prompt,size));
-  if(document.getElementById('m_sd').checked)      jobs.push(embedIframe('sd',prompt,size));
-  if(document.getElementById('m_pixart').checked)  jobs.push(embedIframe('pixart',prompt,size));
-  if(document.getElementById('m_sdxl').checked)    jobs.push(embedIframe('sdxl',prompt,size));
-  // ejemplo: modelo nuevo
-  if(document.getElementById('m_sd3_5').checked)    jobs.push(embedIframe('sd3_5',prompt,size));
-  // DALL·E 3 opcional
-  if(document.getElementById('m_dalle').checked)   jobs.push(openAIDALLE3(prompt,size));
-  // fallback siempre
-  jobs.push(pollinationsGenerate(prompt,size));
+    <script>
+        // ==========================================
+        // GOOGLE SIGN-IN CONFIGURATION
+        // ==========================================
+        
+        // Sistema de configuración de Google Client ID
+        // El administrador debe configurar esto una vez para habilitar Google Sign-In real
+        let GOOGLE_CLIENT_ID = localStorage.getItem('aiArenaGoogleClientId') || '';
+        let IS_CLIENT_ID_CONFIGURED = GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID.includes('.apps.googleusercontent.com');
+        
+        let currentUser = null;
+        let googleAuth = null;
 
-  await Promise.all(jobs);
-  document.getElementById('loader').style.display = 'none';
-};
+        // Initialize Google Sign-In when library loads
+        window.onload = function() {
+            // Check if we have a saved session
+            const savedUser = localStorage.getItem('aiArenaUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUIForLoggedInUser();
+                loadUserData();
+            } else {
+                updateUIForLoggedOutUser();
+            }
+            
+            // Initialize Google Identity Services
+            if (typeof google !== 'undefined' && google.accounts) {
+                initializeGoogleSignIn();
+            } else {
+                // Retry after a short delay if library not loaded yet
+                setTimeout(() => {
+                    if (typeof google !== 'undefined' && google.accounts) {
+                        initializeGoogleSignIn();
+                    }
+                }, 1000);
+            }
+            
+            // Initialize app
+            renderModels();
+            renderLeaderboard();
+            renderHistory();
+            renderServicesPanel();
+            setupEventListeners();
+        };
 
-/* ---------- 6️⃣ Gradio (necesario para HF Spaces) ---------- */
-const g = document.createElement('script');
-g.src = "https://gradio.app/js/gradio.js";
-document.head.appendChild(g);
-</script>
+        function initializeGoogleSignIn() {
+            if (!IS_CLIENT_ID_CONFIGURED) {
+                console.log('Google Sign-In no configurado. Usando modo demo.');
+                return;
+            }
+            
+            try {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse,
+                    auto_select: false,
+                    cancel_on_tap_outside: true,
+                });
+                
+                // Render the Google Sign-In button (hidden, we use custom button)
+                google.accounts.id.renderButton(
+                    document.createElement('div'),
+                    { theme: 'outline', size: 'large' }
+                );
+            } catch (error) {
+                console.log('Google Sign-In initialization pending...');
+            }
+        }
+
+        function handleGoogleLogin() {
+            if (!IS_CLIENT_ID_CONFIGURED) {
+                showGoogleClientIdConfiguration();
+                return;
+            }
+            
+            if (typeof google !== 'undefined' && google.accounts) {
+                // Use Google Identity Services
+                google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        // Fallback: show manual login
+                        showManualLoginOptions();
+                    }
+                });
+            } else {
+                // Library not loaded yet
+                showManualLoginOptions();
+            }
+        }
+
+        function showDemoLogin() {
+            // Demo login for testing (when Google Client ID is not configured)
+            const modal = document.getElementById('apiModal');
+            const body = document.getElementById('apiModalBody');
+            
+            body.innerHTML = `
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🔐</div>
+                    <h3 style="margin-bottom: 1rem;">Iniciar sesión con Google</h3>
+                    
+                    <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; text-align: left;">
+                        <p style="font-size: 0.875rem; color: var(--accent-orange); margin-bottom: 0.5rem;">⚠️ Modo Demo</p>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary);">
+                            Para habilitar Google Sign-In real, configura tu <strong>GOOGLE_CLIENT_ID</strong> en el código.
+                            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--accent-blue);">Obtener Client ID →</a>
+                        </p>
+                    </div>
+                    
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.875rem;">
+                        Ingresa tus datos para probar la funcionalidad:
+                    </p>
+                    
+                    <input type="text" id="demoUserName" placeholder="Tu nombre" 
+                           style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem; margin-bottom: 0.75rem;">
+                    
+                    <input type="email" id="demoUserEmail" placeholder="tu@email.com" 
+                           style="width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1rem; margin-bottom: 1rem;">
+                    
+                    <button onclick="handleDemoLogin()" style="width: 100%; padding: 0.875rem; background: var(--gradient-1); border: none; border-radius: 10px; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width: 20px; height: 20px;">
+                        Continuar (Demo)
+                    </button>
+                    
+                    <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+                        Los datos se guardan localmente en tu navegador
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('apiModal').querySelector('.modal-title').textContent = '👤 Iniciar Sesión';
+            modal.classList.add('active');
+        }
+
+        function showGoogleClientIdConfiguration() {
+            const modal = document.getElementById('apiModal');
+            const body = document.getElementById('apiModalBody');
+            
+            body.innerHTML = `
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🔧</div>
+                    <h3 style="margin-bottom: 0.5rem;">Configurar Google Sign-In</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Para habilitar Google Sign-In real para todos los usuarios, 
+                        necesitas configurar un Google Client ID.
+                    </p>
+                    
+                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1)); 
+                                border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; 
+                                padding: 1.25rem; margin-bottom: 1.5rem; text-align: left;">
+                        <h4 style="margin-bottom: 0.75rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fab fa-google" style="color: #4285f4;"></i> Pasos para obtener Client ID:
+                        </h4>
+                        <ol style="margin: 0; padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.8;">
+                            <li>Ve a <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--accent-blue);">Google Cloud Console → Credenciales</a></li>
+                            <li>Crea un nuevo proyecto o selecciona uno existente</li>
+                            <li>Haz clic en <strong>"Crear credenciales" → "ID de cliente de OAuth"</strong></li>
+                            <li>Selecciona <strong>"Aplicación web"</strong> como tipo de aplicación</li>
+                            <li>En "Orígenes de JavaScript autorizados", añade:
+                                <ul style="margin-top: 0.25rem; padding-left: 1rem;">
+                                    <li><code>${window.location.origin}</code> (tu dominio actual)</li>
+                                    <li><code>http://localhost:3000</code> si pruebas localmente</li>
+                                    <li><code>https://tu-dominio.com</code> tu dominio de producción</li>
+                                </ul>
+                            </li>
+                            <li>Haz clic en "Crear" y copia el <strong>Client ID</strong></li>
+                        </ol>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; text-align: left; margin-bottom: 0.5rem; font-weight: 500;">
+                            Tu Google Client ID:
+                        </label>
+                        <input type="text" id="googleClientIdInput" 
+                               placeholder="ej: 1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com"
+                               style="width: 100%; padding: 0.875rem 1rem; background: var(--bg-secondary); 
+                                      border: 1px solid var(--border-color); border-radius: 8px; 
+                                      color: var(--text-primary); font-size: 0.9rem; font-family: monospace;"
+                               value="${GOOGLE_CLIENT_ID}">
+                        <p style="text-align: left; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Formato: <code>[numeros]-[texto].apps.googleusercontent.com</code>
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="saveGoogleClientId()" 
+                                style="padding: 0.875rem 1.5rem; background: var(--accent-green); border: none; 
+                                       border-radius: 10px; color: white; font-weight: 600; cursor: pointer;">
+                            💾 Guardar Client ID
+                        </button>
+                        
+                        <button onclick="testGoogleClientId()" 
+                                style="padding: 0.875rem 1.5rem; background: var(--bg-secondary); 
+                                       border: 1px solid var(--border-color); border-radius: 10px; 
+                                       color: var(--text-primary); font-weight: 600; cursor: pointer;">
+                            🧪 Probar Client ID
+                        </button>
+                        
+                        <button onclick="closeApiModal()" 
+                                style="padding: 0.875rem 1.5rem; background: transparent; 
+                                       border: 1px solid var(--border-color); border-radius: 10px; 
+                                       color: var(--text-secondary); font-weight: 600; cursor: pointer;">
+                            Cancelar
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">
+                            <strong>Nota:</strong> Una vez configurado, todos los usuarios podrán iniciar sesión con 
+                            sus cuentas de Google reales. El Client ID se guarda localmente en este navegador.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('apiModal').querySelector('.modal-title').textContent = '⚙️ Configurar Google Sign-In';
+            modal.classList.add('active');
+        }
+
+        function saveGoogleClientId() {
+            const input = document.getElementById('googleClientIdInput');
+            const clientId = input.value.trim();
+            
+            if (!clientId) {
+                showToast('Introduce un Google Client ID', 'error');
+                return;
+            }
+            
+            if (!clientId.includes('.apps.googleusercontent.com')) {
+                showToast('Client ID no válido. Debe terminar en .apps.googleusercontent.com', 'error');
+                return;
+            }
+            
+            localStorage.setItem('aiArenaGoogleClientId', clientId);
+            GOOGLE_CLIENT_ID = clientId;
+            IS_CLIENT_ID_CONFIGURED = true;
+            
+            // Reinicializar Google Sign-In con el nuevo Client ID
+            if (typeof google !== 'undefined' && google.accounts) {
+                initializeGoogleSignIn();
+            }
+            
+            closeApiModal();
+            showToast('✅ Google Client ID guardado correctamente', 'success');
+            showToast('Recarga la página para aplicar los cambios', 'info');
+        }
+
+        function testGoogleClientId() {
+            const input = document.getElementById('googleClientIdInput');
+            const clientId = input.value.trim();
+            
+            if (!clientId) {
+                showToast('Introduce un Client ID para probar', 'error');
+                return;
+            }
+            
+            if (!clientId.includes('.apps.googleusercontent.com')) {
+                showToast('Formato incorrecto', 'error');
+                return;
+            }
+            
+            showToast('✓ Client ID válido. Ahora haz clic en "Guardar".', 'success');
+        }
+
+        function showManualLoginOptions() {
+            // Opciones manuales cuando Google Sign-In no está disponible
+            const modal = document.getElementById('apiModal');
+            const body = document.getElementById('apiModalBody');
+            
+            body.innerHTML = `
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🔐</div>
+                    <h3 style="margin-bottom: 0.5rem;">Iniciar Sesión</h3>
+                    
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Selecciona un método de autenticación:
+                    </p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px; margin: 0 auto;">
+                        ${IS_CLIENT_ID_CONFIGURED ? `
+                            <button onclick="triggerGoogleSignIn()" 
+                                    style="padding: 0.875rem; background: white; border: none; border-radius: 10px; 
+                                           color: #333; font-weight: 600; cursor: pointer; display: flex; 
+                                           align-items: center; justify-content: center; gap: 0.5rem;">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                                     alt="Google" style="width: 20px; height: 20px;">
+                                Continuar con Google
+                            </button>
+                        ` : ''}
+                        
+                        <button onclick="showDemoLogin()" 
+                                style="padding: 0.875rem; background: var(--bg-secondary); border: 1px solid var(--border-color); 
+                                       border-radius: 10px; color: var(--text-primary); font-weight: 600; cursor: pointer;">
+                            👤 Modo Demo (sin configuración)
+                        </button>
+                        
+                        ${!IS_CLIENT_ID_CONFIGURED ? `
+                            <button onclick="showGoogleClientIdConfiguration()" 
+                                    style="padding: 0.875rem; background: transparent; border: 1px solid var(--accent-blue); 
+                                           border-radius: 10px; color: var(--accent-blue); font-weight: 600; cursor: pointer;">
+                                ⚙️ Configurar Google Sign-In
+                            </button>
+                        ` : ''}
+                    </div>
+                    
+                    ${!IS_CLIENT_ID_CONFIGURED ? `
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(245, 158, 11, 0.15); 
+                                    border-radius: 8px; text-align: left;">
+                            <p style="font-size: 0.8rem; color: var(--accent-orange); margin: 0;">
+                                ⚠️ Google Sign-In no está configurado. Contacta al administrador del sitio.
+                            </p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('apiModal').querySelector('.modal-title').textContent = '👤 Iniciar Sesión';
+            modal.classList.add('active');
+        }
+
+        function triggerGoogleSignIn() {
+            if (typeof google !== 'undefined' && google.accounts && IS_CLIENT_ID_CONFIGURED) {
+                google.accounts.id.prompt();
+                closeApiModal();
+            } else {
+                showToast('Google Sign-In no disponible', 'error');
+            }
+        }
+
+        function handleDemoLogin() {
+            const name = document.getElementById('demoUserName').value.trim();
+            const email = document.getElementById('demoUserEmail').value.trim();
+            
+            if (!name || !email) {
+                showToast('Por favor completa todos los campos', 'error');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                showToast('Email no válido', 'error');
+                return;
+            }
+            
+            // Create demo user
+            currentUser = {
+                id: 'demo_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 20),
+                name: name,
+                email: email,
+                picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=8b5cf6&color=fff&size=128`,
+                isDemo: true,
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('aiArenaUser', JSON.stringify(currentUser));
+            
+            closeApiModal();
+            updateUIForLoggedInUser();
+            loadUserData();
+            
+            showToast(`¡Bienvenido, ${name}!`, 'success');
+        }
+
+        function handleCredentialResponse(response) {
+            // Decode the JWT token from Google
+            const payload = decodeJWT(response.credential);
+            
+            if (payload) {
+                currentUser = {
+                    id: payload.sub,
+                    name: payload.name,
+                    email: payload.email,
+                    picture: payload.picture,
+                    isDemo: false,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('aiArenaUser', JSON.stringify(currentUser));
+                
+                updateUIForLoggedInUser();
+                loadUserData();
+                
+                showToast(`¡Bienvenido, ${payload.name}!`, 'success');
+            }
+        }
+
+        function decodeJWT(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error('Error decoding JWT:', e);
+                return null;
+            }
+        }
+
+        function updateUIForLoggedInUser() {
+            const authContainer = document.getElementById('authContainer');
+            const loginPromptArea = document.getElementById('loginPromptArea');
+            
+            authContainer.innerHTML = `
+                <div class="user-profile-container">
+                    <div class="user-profile" onclick="toggleUserDropdown()">
+                        <img class="user-avatar" src="${currentUser.picture}" alt="${currentUser.name}" referrerpolicy="no-referrer">
+                        <div class="user-info">
+                            <span class="user-name">${currentUser.name.split(' ')[0]}</span>
+                            <span class="sync-indicator">Sincronizado</span>
+                        </div>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.5rem;">
+                            <div style="font-weight: 600;">${currentUser.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${currentUser.email}</div>
+                            ${currentUser.isDemo ? '<div style="font-size: 0.65rem; color: var(--accent-orange); margin-top: 0.25rem;">⚠️ Cuenta Demo</div>' : ''}
+                        </div>
+                        <button class="user-dropdown-item" onclick="exportUserData()">
+                            📥 Exportar mis datos
+                        </button>
+                        <button class="user-dropdown-item" onclick="importUserData()">
+                            📤 Importar datos
+                        </button>
+                        ${currentUser.isDemo || !IS_CLIENT_ID_CONFIGURED ? `
+                            <button class="user-dropdown-item" onclick="showGoogleClientIdConfiguration()">
+                                ⚙️ Configurar Google Sign-In
+                            </button>
+                        ` : ''}
+                        <button class="user-dropdown-item logout" onclick="handleLogout()">
+                            🚪 Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            loginPromptArea.innerHTML = `
+                <div class="welcome-message">
+                    <img src="${currentUser.picture}" alt="${currentUser.name}" referrerpolicy="no-referrer">
+                    <div class="welcome-text">
+                        <h3>👋 ¡Hola, ${currentUser.name.split(' ')[0]}!</h3>
+                        <p>Tu historial y preferencias están sincronizados</p>
+                    </div>
+                </div>
+            `;
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', handleClickOutsideDropdown);
+        }
+
+        function updateUIForLoggedOutUser() {
+            const authContainer = document.getElementById('authContainer');
+            const loginPromptArea = document.getElementById('loginPromptArea');
+            
+            authContainer.innerHTML = `
+                <button class="google-login-btn" id="googleLoginBtn" onclick="handleGoogleLogin()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Iniciar sesión
+                </button>
+            `;
+            
+            loginPromptArea.innerHTML = `
+                <div class="login-prompt-card">
+                    <div class="login-prompt-content">
+                        <h3>🔐 Inicia sesión para una mejor experiencia</h3>
+                        <p>Guarda tu historial, preferencias y API keys de forma segura</p>
+                        <div class="login-prompt-benefits">
+                            <span class="login-benefit">💾 Guardar historial</span>
+                            <span class="login-benefit">🔑 API keys seguras</span>
+                            <span class="login-benefit">⚙️ Preferencias</span>
+                            <span class="login-benefit">📊 Estadísticas</span>
+                        </div>
+                        ${!IS_CLIENT_ID_CONFIGURED ? `
+                            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(245, 158, 11, 0.15); border-radius: 8px;">
+                                <p style="font-size: 0.75rem; color: var(--accent-orange); margin: 0;">
+                                    ⚠️ Google Sign-In no configurado. Contacta al administrador o usa modo demo.
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="google-login-btn" onclick="handleGoogleLogin()">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                            ${IS_CLIENT_ID_CONFIGURED ? 'Iniciar con Google' : 'Configurar'}
+                        </button>
+                        ${!IS_CLIENT_ID_CONFIGURED ? `
+                            <button class="api-keys-btn" onclick="showGoogleClientIdConfiguration()" style="margin: 0;">
+                                ⚙️ Configurar
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function handleClickOutsideDropdown(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const profileContainer = document.querySelector('.user-profile-container');
+            
+            if (dropdown && profileContainer && !profileContainer.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        }
+
+        function handleLogout() {
+            // Sign out from Google if using real Google Sign-In
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.disableAutoSelect();
+            }
+            
+            // Clear user data
+            currentUser = null;
+            localStorage.removeItem('aiArenaUser');
+            
+            // Remove click listener
+            document.removeEventListener('click', handleClickOutsideDropdown);
+            
+            updateUIForLoggedOutUser();
+            showToast('Sesión cerrada correctamente', 'info');
+        }
+
+        function exportUserData() {
+            const data = {
+                user: {
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    exportDate: new Date().toISOString()
+                },
+                apiKeys: apiKeys,
+                history: history,
+                leaderboard: leaderboard
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-arena-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            toggleUserDropdown();
+            showToast('Datos exportados correctamente', 'success');
+        }
+
+        function importUserData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        if (data.apiKeys) apiKeys = data.apiKeys;
+                        if (data.history) history = data.history;
+                        if (data.leaderboard) leaderboard = data.leaderboard;
+                        
+                        // Save to localStorage
+                        localStorage.setItem('aiArenaApiKeys', JSON.stringify(apiKeys));
+                        localStorage.setItem('aiArenaHistory', JSON.stringify(history));
+                        localStorage.setItem('aiArenaLeaderboard', JSON.stringify(leaderboard));
+                        saveUserData();
+                        
+                        renderModels();
+                        renderLeaderboard();
+                        renderHistory();
+                        
+                        showToast('Datos importados correctamente', 'success');
+                    } catch (error) {
+                        showToast('Error al importar: archivo no válido', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+            toggleUserDropdown();
+        }
+
+        // ==========================================
+        // AI SERVICES QUICK LOGIN FUNCTIONS
+        // ==========================================
+
+        function renderServicesPanel() {
+            const grid = document.getElementById('servicesGrid');
+            const summaryEl = document.getElementById('connectedSummary');
+            
+            if (!grid) return;
+
+            // Render service cards
+            grid.innerHTML = aiServices.map(service => {
+                const isConnected = connectedAccounts[service.id];
+                const statusClass = isConnected ? 'connected' : 'disconnected';
+                const statusText = isConnected ? '✓ Conectado' : '○ No conectado';
+                
+                return `
+                    <div class="service-card" data-service="${service.id}">
+                        <div class="service-header">
+                            <div class="service-icon">
+                                <img src="${service.icon}" alt="${service.name}" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span style="display: none;">${service.iconFallback}</span>
+                            </div>
+                            <div>
+                                <div class="service-name">${service.name}</div>
+                                <div class="service-models">${service.models.slice(0, 2).join(', ')}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="service-status ${statusClass}">
+                            ${statusText}
+                        </div>
+                        
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.5rem 0;">
+                            ${service.description}
+                        </p>
+                        
+                        <div class="service-actions">
+                            ${isConnected ? `
+                                <button class="service-btn manual-auth" onclick="openService('${service.id}', 'dashboard')">
+                                    <i class="fas fa-external-link-alt"></i> Abrir
+                                </button>
+                                <button class="service-btn disconnect" onclick="disconnectService('${service.id}')">
+                                    <i class="fas fa-unlink"></i>
+                                </button>
+                            ` : `
+                                ${service.supportsGoogle ? `
+                                    <button class="service-btn google-auth" onclick="loginWithGoogle('${service.id}')">
+                                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
+                                        Google
+                                    </button>
+                                ` : ''}
+                                <button class="service-btn manual-auth" onclick="openService('${service.id}', 'signup')">
+                                    <i class="fas fa-user-plus"></i> ${service.supportsGoogle ? 'Manual' : 'Registrar'}
+                                </button>
+                            `}
+                        </div>
+                        
+                        ${service.apiKeyUrl && isConnected ? `
+                            <button class="service-btn manual-auth" style="width: 100%; margin-top: 0.5rem;" 
+                                    onclick="openService('${service.id}', 'apikey')">
+                                <i class="fas fa-key"></i> Obtener API Key
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Update connected summary
+            const connectedCount = Object.keys(connectedAccounts).filter(k => connectedAccounts[k]).length;
+            if (connectedCount > 0) {
+                const connectedServices = aiServices.filter(s => connectedAccounts[s.id]);
+                summaryEl.innerHTML = `
+                    <div class="connected-accounts-summary">
+                        ${connectedServices.map(s => `
+                            <span class="connected-badge">
+                                <img src="${s.icon}" alt="${s.name}" 
+                                     onerror="this.outerHTML='${s.iconFallback}'">
+                                ${s.name}
+                            </span>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                summaryEl.innerHTML = '';
+            }
+        }
+
+        function loginWithGoogle(serviceId) {
+            const service = aiServices.find(s => s.id === serviceId);
+            if (!service) return;
+
+            // Check if user is logged into our platform first
+            if (!currentUser) {
+                showToast('Primero inicia sesión con Google en nuestra plataforma', 'info');
+                handleGoogleLogin();
+                return;
+            }
+
+            // Open the service's login page in a popup
+            const width = 600;
+            const height = 700;
+            const left = (window.innerWidth - width) / 2;
+            const top = (window.innerHeight - height) / 2;
+            
+            const popup = window.open(
+                service.loginUrl,
+                `Login_${service.name}`,
+                `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
+            );
+
+            // Show instructions
+            showLoginInstructions(service, popup);
+        }
+
+        function showLoginInstructions(service, popup) {
+            const modal = document.getElementById('apiModal');
+            const body = document.getElementById('apiModalBody');
+            const title = document.getElementById('apiModal').querySelector('.modal-title');
+            
+            title.textContent = `🔗 Conectar ${service.name}`;
+            
+            body.innerHTML = `
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">
+                        <img src="${service.icon}" alt="${service.name}" style="width: 64px; height: 64px; border-radius: 12px;"
+                             onerror="this.outerHTML='<span style=\\"font-size: 4rem;\\">${service.iconFallback}</span>'">
+                    </div>
+                    
+                    <h3 style="margin-bottom: 0.5rem;">Iniciando sesión en ${service.name}</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Se ha abierto una ventana para iniciar sesión
+                    </p>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: 12px; padding: 1.25rem; text-align: left; margin-bottom: 1.5rem;">
+                        <h4 style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                            <i class="fab fa-google" style="color: #4285f4;"></i> Pasos para inicio rápido:
+                        </h4>
+                        <ol style="margin: 0; padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.8;">
+                            <li>En la ventana emergente, busca <strong>"Continuar con Google"</strong></li>
+                            <li>Selecciona tu cuenta: <strong>${currentUser ? currentUser.email : 'tu cuenta de Google'}</strong></li>
+                            <li>Acepta los permisos si es necesario</li>
+                            <li>Una vez dentro, vuelve aquí y confirma la conexión</li>
+                        </ol>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="confirmConnection('${service.id}')" 
+                                style="padding: 0.875rem 1.5rem; background: var(--accent-green); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-check"></i> Ya inicié sesión
+                        </button>
+                        
+                        <button onclick="retryLogin('${service.id}')" 
+                                style="padding: 0.875rem 1.5rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-redo"></i> Abrir de nuevo
+                        </button>
+                        
+                        <button onclick="closeApiModal()" 
+                                style="padding: 0.875rem 1.5rem; background: transparent; border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-secondary); font-weight: 600; cursor: pointer;">
+                            Cancelar
+                        </button>
+                    </div>
+                    
+                    ${service.apiKeyUrl ? `
+                        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                                ¿Necesitas una API Key para usar este servicio?
+                            </p>
+                            <button onclick="window.open('${service.apiKeyUrl}', '_blank')" 
+                                    style="padding: 0.5rem 1rem; background: var(--bg-card); border: 1px solid var(--accent-purple); border-radius: 8px; color: var(--accent-purple); font-size: 0.8rem; cursor: pointer;">
+                                <i class="fas fa-key"></i> Obtener API Key
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function confirmConnection(serviceId) {
+            const service = aiServices.find(s => s.id === serviceId);
+            
+            connectedAccounts[serviceId] = {
+                connected: true,
+                connectedAt: new Date().toISOString(),
+                email: currentUser ? currentUser.email : 'unknown'
+            };
+            
+            localStorage.setItem('aiArenaConnectedAccounts', JSON.stringify(connectedAccounts));
+            saveUserData();
+            
+            closeApiModal();
+            renderServicesPanel();
+            renderModels();
+            
+            showToast(`✓ ${service.name} conectado correctamente`, 'success');
+        }
+
+        function retryLogin(serviceId) {
+            closeApiModal();
+            loginWithGoogle(serviceId);
+        }
+
+        function openService(serviceId, type = 'login') {
+            const service = aiServices.find(s => s.id === serviceId);
+            if (!service) return;
+
+            let url = service.loginUrl;
+            if (type === 'signup') url = service.signupUrl || service.loginUrl;
+            if (type === 'apikey') url = service.apiKeyUrl || service.loginUrl;
+            if (type === 'dashboard') url = service.loginUrl;
+
+            window.open(url, '_blank');
+        }
+
+        function disconnectService(serviceId) {
+            const service = aiServices.find(s => s.id === serviceId);
+            
+            if (confirm(`¿Desconectar ${service.name}? Esto solo elimina el registro local, no cierra sesión en el servicio.`)) {
+                delete connectedAccounts[serviceId];
+                localStorage.setItem('aiArenaConnectedAccounts', JSON.stringify(connectedAccounts));
+                saveUserData();
+                
+                renderServicesPanel();
+                showToast(`${service.name} desconectado`, 'info');
+            }
+        }
+
+        function loadUserData() {
+            if (!currentUser) return;
+            
+            // Load user-specific data
+            const userKey = `aiArena_${currentUser.id}`;
+            
+            const userData = localStorage.getItem(userKey);
+            if (userData) {
+                const data = JSON.parse(userData);
+                apiKeys = data.apiKeys || {};
+                history = data.history || [];
+                leaderboard = data.leaderboard || {};
+                connectedAccounts = data.connectedAccounts || {};
+                
+                // Update localStorage with the user's data as active
+                localStorage.setItem('aiArenaApiKeys', JSON.stringify(apiKeys));
+                localStorage.setItem('aiArenaHistory', JSON.stringify(history));
+                localStorage.setItem('aiArenaLeaderboard', JSON.stringify(leaderboard));
+                localStorage.setItem('aiArenaConnectedAccounts', JSON.stringify(connectedAccounts));
+                
+                renderModels();
+                renderLeaderboard();
+                renderHistory();
+                renderServicesPanel();
+            }
+        }
+
+        function saveUserData() {
+            if (!currentUser) return;
+            
+            const userKey = `aiArena_${currentUser.id}`;
+            const userData = {
+                apiKeys: apiKeys,
+                history: history,
+                leaderboard: leaderboard,
+                connectedAccounts: connectedAccounts,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem(userKey, JSON.stringify(userData));
+        }
+
+        // ==========================================
+        // MODELS DATA
+        // ==========================================
+        
+        const models = [
+            { id: 'pollinations-flux', name: 'Flux (Pollinations)', provider: 'Pollinations.ai', type: 'free', avgTime: 8, quality: 85, endpoint: 'https://image.pollinations.ai/prompt/' },
+            { id: 'stable-horde', name: 'Stable Diffusion Horde', provider: 'Stable Horde', type: 'free', avgTime: 45, quality: 80 },
+            { id: 'craiyon', name: 'Craiyon (DALL-E Mini)', provider: 'Craiyon', type: 'free', avgTime: 60, quality: 65 },
+            { id: 'flux-dev', name: 'FLUX.1 [dev]', provider: 'Black Forest Labs', type: 'beta', avgTime: 12, quality: 92 },
+            { id: 'sdxl-turbo', name: 'SDXL Turbo', provider: 'Stability AI', type: 'beta', avgTime: 3, quality: 82 },
+            { id: 'playground-v2', name: 'Playground v2.5', provider: 'Playground AI', type: 'beta', avgTime: 15, quality: 88 },
+            { id: 'dreamshaper', name: 'DreamShaper XL', provider: 'Community', type: 'community', avgTime: 20, quality: 87 },
+            { id: 'realvisxl', name: 'RealVisXL', provider: 'Community', type: 'community', avgTime: 22, quality: 90 },
+            { id: 'animagine', name: 'Animagine XL', provider: 'Community', type: 'community', avgTime: 18, quality: 85 },
+            { id: 'juggernaut', name: 'Juggernaut XL', provider: 'Community', type: 'community', avgTime: 25, quality: 91 },
+            { id: 'dalle3', name: 'DALL-E 3', provider: 'OpenAI', type: 'api-key', avgTime: 15, quality: 95, requiresKey: 'openai' },
+            { id: 'midjourney', name: 'Midjourney v6', provider: 'Midjourney', type: 'api-key', avgTime: 30, quality: 98, requiresKey: 'midjourney' },
+            { id: 'stability-sd3', name: 'Stable Diffusion 3', provider: 'Stability AI', type: 'api-key', avgTime: 10, quality: 93, requiresKey: 'stability' },
+            { id: 'ideogram', name: 'Ideogram 2.0', provider: 'Ideogram', type: 'api-key', avgTime: 12, quality: 90, requiresKey: 'ideogram' },
+            { id: 'leonardo', name: 'Leonardo.AI Phoenix', provider: 'Leonardo.AI', type: 'api-key', avgTime: 8, quality: 88, requiresKey: 'leonardo' },
+            { id: 'replicate-flux', name: 'FLUX Pro (Replicate)', provider: 'Replicate', type: 'api-key', avgTime: 6, quality: 94, requiresKey: 'replicate' }
+        ];
+
+        const apiKeyProviders = [
+            { id: 'openai', name: 'OpenAI', icon: '🤖', models: ['DALL-E 3'] },
+            { id: 'stability', name: 'Stability AI', icon: '🎨', models: ['Stable Diffusion 3'] },
+            { id: 'replicate', name: 'Replicate', icon: '🔄', models: ['FLUX Pro'] },
+            { id: 'midjourney', name: 'Midjourney', icon: '🌈', models: ['Midjourney v6'] },
+            { id: 'ideogram', name: 'Ideogram', icon: '✍️', models: ['Ideogram 2.0'] },
+            { id: 'leonardo', name: 'Leonardo.AI', icon: '🦁', models: ['Leonardo Phoenix'] }
+        ];
+
+        // AI Services that support Google Sign-In
+        const aiServices = [
+            {
+                id: 'openai',
+                name: 'OpenAI',
+                icon: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg',
+                iconFallback: '🤖',
+                models: ['DALL-E 3', 'GPT-4 Vision'],
+                supportsGoogle: true,
+                loginUrl: 'https://chat.openai.com/',
+                signupUrl: 'https://platform.openai.com/signup',
+                apiKeyUrl: 'https://platform.openai.com/api-keys',
+                description: 'DALL-E 3 - Generación de alta calidad'
+            },
+            {
+                id: 'leonardo',
+                name: 'Leonardo.AI',
+                icon: 'https://leonardo.ai/favicon.ico',
+                iconFallback: '🦁',
+                models: ['Leonardo Phoenix', 'Leonardo Diffusion XL'],
+                supportsGoogle: true,
+                loginUrl: 'https://app.leonardo.ai/',
+                signupUrl: 'https://app.leonardo.ai/auth/login',
+                description: '150 créditos gratis diarios'
+            },
+            {
+                id: 'ideogram',
+                name: 'Ideogram',
+                icon: 'https://ideogram.ai/favicon.ico',
+                iconFallback: '✍️',
+                models: ['Ideogram 2.0'],
+                supportsGoogle: true,
+                loginUrl: 'https://ideogram.ai/',
+                signupUrl: 'https://ideogram.ai/login',
+                description: 'Excelente para texto en imágenes'
+            },
+            {
+                id: 'playground',
+                name: 'Playground AI',
+                icon: 'https://playground.com/favicon.ico',
+                iconFallback: '🎮',
+                models: ['Playground v2.5'],
+                supportsGoogle: true,
+                loginUrl: 'https://playground.com/',
+                signupUrl: 'https://playground.com/login',
+                description: '500 imágenes gratis al día'
+            },
+            {
+                id: 'clipdrop',
+                name: 'Clipdrop (Stability)',
+                icon: 'https://clipdrop.co/favicon.ico',
+                iconFallback: '🎨',
+                models: ['SDXL', 'Stable Diffusion 3'],
+                supportsGoogle: true,
+                loginUrl: 'https://clipdrop.co/',
+                signupUrl: 'https://clipdrop.co/auth',
+                description: 'Acceso a modelos de Stability AI'
+            },
+            {
+                id: 'runwayml',
+                name: 'Runway ML',
+                icon: 'https://runwayml.com/favicon.ico',
+                iconFallback: '🎬',
+                models: ['Gen-2', 'AI Image Generation'],
+                supportsGoogle: true,
+                loginUrl: 'https://app.runwayml.com/',
+                signupUrl: 'https://app.runwayml.com/login',
+                description: 'Imágenes y video con IA'
+            },
+            {
+                id: 'nightcafe',
+                name: 'NightCafe',
+                icon: 'https://nightcafe.studio/favicon.ico',
+                iconFallback: '🌙',
+                models: ['SDXL', 'DALL-E', 'Stable Diffusion'],
+                supportsGoogle: true,
+                loginUrl: 'https://creator.nightcafe.studio/',
+                signupUrl: 'https://creator.nightcafe.studio/create',
+                description: '5 créditos gratis diarios'
+            },
+            {
+                id: 'civitai',
+                name: 'Civitai',
+                icon: 'https://civitai.com/favicon.ico',
+                iconFallback: '🎭',
+                models: ['Community Models', 'DreamShaper', 'RealVisXL'],
+                supportsGoogle: true,
+                loginUrl: 'https://civitai.com/',
+                signupUrl: 'https://civitai.com/login',
+                description: 'Miles de modelos comunitarios'
+            },
+            {
+                id: 'huggingface',
+                name: 'Hugging Face',
+                icon: 'https://huggingface.co/favicon.ico',
+                iconFallback: '🤗',
+                models: ['FLUX', 'SDXL', 'Modelos Open Source'],
+                supportsGoogle: true,
+                loginUrl: 'https://huggingface.co/',
+                signupUrl: 'https://huggingface.co/join',
+                apiKeyUrl: 'https://huggingface.co/settings/tokens',
+                description: 'Modelos open source gratuitos'
+            },
+            {
+                id: 'replicate',
+                name: 'Replicate',
+                icon: 'https://replicate.com/favicon.ico',
+                iconFallback: '🔄',
+                models: ['FLUX Pro', 'SDXL', 'Many models'],
+                supportsGoogle: false,
+                loginUrl: 'https://replicate.com/',
+                signupUrl: 'https://replicate.com/signin',
+                apiKeyUrl: 'https://replicate.com/account/api-tokens',
+                description: 'API para muchos modelos'
+            },
+            {
+                id: 'stability',
+                name: 'Stability AI',
+                icon: 'https://stability.ai/favicon.ico',
+                iconFallback: '🎨',
+                models: ['Stable Diffusion 3', 'SDXL'],
+                supportsGoogle: false,
+                loginUrl: 'https://platform.stability.ai/',
+                signupUrl: 'https://platform.stability.ai/account',
+                apiKeyUrl: 'https://platform.stability.ai/account/keys',
+                description: 'API oficial de Stability'
+            },
+            {
+                id: 'midjourney',
+                name: 'Midjourney',
+                icon: 'https://www.midjourney.com/favicon.ico',
+                iconFallback: '🌈',
+                models: ['Midjourney v6'],
+                supportsGoogle: false,
+                loginUrl: 'https://www.midjourney.com/',
+                signupUrl: 'https://www.midjourney.com/',
+                description: 'Requiere Discord + Suscripción'
+            }
+        ];
+
+        // Connected accounts state
+        let connectedAccounts = JSON.parse(localStorage.getItem('aiArenaConnectedAccounts') || '{}');
+
+        let selectedModels = new Set();
+        let currentFilter = 'all';
+        let apiKeys = JSON.parse(localStorage.getItem('aiArenaApiKeys') || '{}');
+        let history = JSON.parse(localStorage.getItem('aiArenaHistory') || '[]');
+        let leaderboard = JSON.parse(localStorage.getItem('aiArenaLeaderboard') || '{}');
+        let isGenerating = false;
+
+        // Note: Initialization moved to window.onload for Google Sign-In
+
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            document.querySelectorAll('.category-badge').forEach(badge => {
+                badge.addEventListener('click', () => {
+                    document.querySelectorAll('.category-badge').forEach(b => b.classList.remove('active'));
+                    badge.classList.add('active');
+                    currentFilter = badge.dataset.category;
+                    renderModels();
+                });
+            });
+
+            document.getElementById('apiModal').addEventListener('click', (e) => {
+                if (e.target.id === 'apiModal') closeApiModal();
+            });
+
+            document.getElementById('promptInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    generateImages();
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `${tabName}-tab`);
+            });
+        }
+
+        function renderModels() {
+            const grid = document.getElementById('modelsGrid');
+            const filteredModels = models.filter(m => currentFilter === 'all' || m.type === currentFilter);
+
+            grid.innerHTML = filteredModels.map(model => {
+                const isSelected = selectedModels.has(model.id);
+                const hasApiKey = model.requiresKey ? apiKeys[model.requiresKey] : true;
+                
+                return `
+                    <div class="model-card ${isSelected ? 'selected' : ''}" 
+                         onclick="toggleModel('${model.id}')"
+                         data-model-id="${model.id}">
+                        <div class="model-checkbox"></div>
+                        <div class="model-card-header">
+                            <div>
+                                <div class="model-name">${model.name}</div>
+                                <div class="model-provider">${model.provider}</div>
+                            </div>
+                            <span class="model-type-badge ${model.type}">
+                                ${getTypeLabel(model.type)}
+                            </span>
+                        </div>
+                        <div class="model-stats">
+                            <div class="model-stat">⏱️ <span>~${model.avgTime}s</span></div>
+                            <div class="model-stat">⭐ <span>${model.quality}%</span></div>
+                            ${model.requiresKey && !hasApiKey ? '<div class="model-stat" style="color: var(--accent-orange);">🔑 Requiere API</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateSelectionCounter();
+        }
+
+        function getTypeLabel(type) {
+            const labels = { 'free': 'FREE', 'beta': 'BETA', 'community': 'COMMUNITY', 'api-key': 'API KEY' };
+            return labels[type] || type;
+        }
+
+        function toggleModel(modelId) {
+            const model = models.find(m => m.id === modelId);
+            
+            if (model.requiresKey && !apiKeys[model.requiresKey]) {
+                showToast(`Necesitas configurar tu API Key de ${model.provider}`, 'error');
+                openApiModal();
+                return;
+            }
+
+            if (selectedModels.has(modelId)) {
+                selectedModels.delete(modelId);
+            } else {
+                if (selectedModels.size >= 6) {
+                    showToast('Máximo 6 modelos a la vez', 'error');
+                    return;
+                }
+                selectedModels.add(modelId);
+            }
+
+            const card = document.querySelector(`[data-model-id="${modelId}"]`);
+            card.classList.toggle('selected', selectedModels.has(modelId));
+            updateSelectionCounter();
+        }
+
+        function clearSelection() {
+            selectedModels.clear();
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            updateSelectionCounter();
+        }
+
+        function updateSelectionCounter() {
+            const counter = document.getElementById('selectionCounter');
+            const countEl = document.getElementById('selectedCount');
+            
+            if (selectedModels.size > 0) {
+                counter.style.display = 'flex';
+                countEl.textContent = `${selectedModels.size} seleccionado${selectedModels.size > 1 ? 's' : ''}`;
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        async function generateImages() {
+            const prompt = document.getElementById('promptInput').value.trim();
+            
+            if (!prompt) {
+                showToast('Escribe un prompt para generar', 'error');
+                return;
+            }
+
+            if (selectedModels.size === 0) {
+                showToast('Selecciona al menos un modelo', 'error');
+                return;
+            }
+
+            if (isGenerating) return;
+            isGenerating = true;
+
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Generando...';
+
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.style.display = 'block';
+            
+            const resultsGrid = document.getElementById('resultsGrid');
+            const selectedModelsList = Array.from(selectedModels).map(id => models.find(m => m.id === id));
+            
+            resultsGrid.innerHTML = selectedModelsList.map(model => `
+                <div class="result-card" data-result-id="${model.id}">
+                    <div class="result-image-container">
+                        <div class="result-loading">
+                            <div class="spinner"></div>
+                            <span>Generando con ${model.name}...</span>
+                            <div class="progress-bar" style="width: 80%;">
+                                <div class="progress-fill" style="width: 0%;" id="progress-${model.id}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-info">
+                        <div class="result-model-name">${model.name}</div>
+                        <div class="result-stats">
+                            <div class="result-stat">
+                                <span class="result-stat-icon">⏱️</span>
+                                <span>Tiempo: </span>
+                                <span class="result-stat-value" id="time-${model.id}">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const results = [];
+            const startTimes = {};
+
+            const promises = selectedModelsList.map(async (model) => {
+                startTimes[model.id] = Date.now();
+                const progressInterval = simulateProgress(model.id, model.avgTime);
+                
+                try {
+                    const result = await simulateGeneration(model, prompt);
+                    clearInterval(progressInterval);
+                    
+                    const endTime = Date.now();
+                    const duration = ((endTime - startTimes[model.id]) / 1000).toFixed(1);
+                    
+                    updateResultCard(model.id, result, duration);
+                    
+                    results.push({
+                        modelId: model.id,
+                        modelName: model.name,
+                        duration: parseFloat(duration),
+                        success: true,
+                        imageUrl: result
+                    });
+
+                    updateLeaderboard(model.id, parseFloat(duration));
+                    
+                } catch (error) {
+                    clearInterval(progressInterval);
+                    updateResultCard(model.id, null, null, error.message);
+                    results.push({
+                        modelId: model.id,
+                        modelName: model.name,
+                        duration: null,
+                        success: false,
+                        error: error.message
+                    });
+                }
+            });
+
+            await Promise.all(promises);
+            showComparisonTable(results);
+            saveToHistory(prompt, results);
+
+            btn.disabled = false;
+            btn.textContent = '🚀 Generar';
+            isGenerating = false;
+
+            showToast('¡Generación completada!', 'success');
+        }
+
+        function simulateProgress(modelId, avgTime) {
+            const progressEl = document.getElementById(`progress-${modelId}`);
+            let progress = 0;
+            
+            return setInterval(() => {
+                progress += (100 / (avgTime * 10));
+                if (progress > 95) progress = 95;
+                if (progressEl) progressEl.style.width = `${progress}%`;
+            }, 100);
+        }
+
+        async function simulateGeneration(model, prompt) {
+            if (model.id === 'pollinations-flux') {
+                const encodedPrompt = encodeURIComponent(prompt);
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&seed=${Date.now()}`;
+                
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(imageUrl);
+                    img.onerror = () => reject(new Error('Error cargando imagen'));
+                    img.src = imageUrl;
+                    setTimeout(() => reject(new Error('Timeout')), 60000);
+                });
+            }
+            
+            const delay = model.avgTime * 1000 * (0.7 + Math.random() * 0.6);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            
+            const seed = Math.random().toString(36).substring(7);
+            return `https://picsum.photos/seed/${seed}/512/512`;
+        }
+
+        function updateResultCard(modelId, imageUrl, duration, error = null) {
+            const card = document.querySelector(`[data-result-id="${modelId}"]`);
+            if (!card) return;
+
+            const imageContainer = card.querySelector('.result-image-container');
+            const timeEl = document.getElementById(`time-${modelId}`);
+
+            if (error) {
+                imageContainer.innerHTML = `<div class="result-placeholder" style="color: var(--accent-red);">❌ Error: ${error}</div>`;
+                if (timeEl) timeEl.textContent = 'Error';
+            } else {
+                imageContainer.innerHTML = `<img class="result-image" src="${imageUrl}" alt="Generated image" loading="lazy">`;
+                if (timeEl) {
+                    timeEl.textContent = `${duration}s`;
+                    const stat = timeEl.closest('.result-stat');
+                    if (parseFloat(duration) < 10) stat.classList.add('fast');
+                    else if (parseFloat(duration) < 30) stat.classList.add('medium');
+                    else stat.classList.add('slow');
+                }
+            }
+        }
+
+        function showComparisonTable(results) {
+            const table = document.getElementById('comparisonTable');
+            const tbody = document.getElementById('comparisonBody');
+            
+            const sorted = results.filter(r => r.success).sort((a, b) => a.duration - b.duration);
+
+            tbody.innerHTML = sorted.map((result, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                
+                return `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+                        <td><strong>${result.modelName}</strong></td>
+                        <td>${result.duration}s</td>
+                        <td style="color: var(--accent-green);">✓ Completado</td>
+                    </tr>
+                `;
+            }).join('');
+
+            results.filter(r => !r.success).forEach(result => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="rank-badge rank-other">-</span></td>
+                        <td><strong>${result.modelName}</strong></td>
+                        <td>-</td>
+                        <td style="color: var(--accent-red);">✗ ${result.error}</td>
+                    </tr>
+                `;
+            });
+
+            table.style.display = 'block';
+        }
+
+        function updateLeaderboard(modelId, duration) {
+            if (!leaderboard[modelId]) {
+                leaderboard[modelId] = { totalTime: 0, count: 0 };
+            }
+            leaderboard[modelId].totalTime += duration;
+            leaderboard[modelId].count += 1;
+            
+            localStorage.setItem('aiArenaLeaderboard', JSON.stringify(leaderboard));
+            saveUserData(); // Sync with user account
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardCard');
+            
+            const leaderboardData = models
+                .map(model => {
+                    const data = leaderboard[model.id];
+                    const avgTime = data ? (data.totalTime / data.count).toFixed(1) : model.avgTime;
+                    const runs = data ? data.count : 0;
+                    return { ...model, avgTime: parseFloat(avgTime), runs };
+                })
+                .sort((a, b) => {
+                    const scoreA = a.quality / a.avgTime;
+                    const scoreB = b.quality / b.avgTime;
+                    return scoreB - scoreA;
+                });
+
+            container.innerHTML = leaderboardData.map((model, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                const score = ((model.quality / model.avgTime) * 10).toFixed(1);
+                
+                return `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank ${rankClass}">${rank}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${model.name}</div>
+                            <div class="leaderboard-provider">${model.provider} • ${model.runs} runs</div>
+                        </div>
+                        <div class="leaderboard-score">
+                            <div class="leaderboard-score-value">${score}</div>
+                            <div class="leaderboard-score-label">Score</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function saveToHistory(prompt, results) {
+            const entry = {
+                id: Date.now(),
+                prompt,
+                results: results.filter(r => r.success).map(r => ({
+                    modelName: r.modelName,
+                    imageUrl: r.imageUrl,
+                    duration: r.duration
+                })),
+                timestamp: new Date().toISOString()
+            };
+            
+            history.unshift(entry);
+            if (history.length > 20) history = history.slice(0, 20);
+            
+            localStorage.setItem('aiArenaHistory', JSON.stringify(history));
+            saveUserData(); // Sync with user account
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🕐</div>
+                        <div class="empty-state-title">Sin historial</div>
+                        <p>Las imágenes generadas aparecerán aquí</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = history.map(entry => {
+                const date = new Date(entry.timestamp);
+                const dateStr = date.toLocaleDateString('es-ES', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="history-item">
+                        <div class="history-prompt">"${entry.prompt}"</div>
+                        <div class="history-images">
+                            ${entry.results.map(r => `
+                                <img class="history-image" src="${r.imageUrl}" alt="${r.modelName}" title="${r.modelName} - ${r.duration}s">
+                            `).join('')}
+                        </div>
+                        <div class="history-date">📅 ${dateStr}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openApiModal() {
+            const modal = document.getElementById('apiModal');
+            const body = document.getElementById('apiModalBody');
+            
+            body.innerHTML = apiKeyProviders.map(provider => {
+                const hasKey = apiKeys[provider.id];
+                const maskedKey = hasKey ? '••••••••' + apiKeys[provider.id].slice(-4) : '';
+                
+                return `
+                    <div class="api-key-item">
+                        <div class="api-key-header">
+                            <div class="api-key-name">
+                                ${provider.icon} ${provider.name}
+                            </div>
+                            <span class="api-key-status ${hasKey ? 'configured' : 'missing'}">
+                                ${hasKey ? '✓ Configurada' : '○ Sin configurar'}
+                            </span>
+                        </div>
+                        <div class="api-key-input-group">
+                            <input type="password" 
+                                   class="api-key-input" 
+                                   id="key-${provider.id}"
+                                   placeholder="${hasKey ? maskedKey : 'Introduce tu API Key...'}">
+                            <button class="api-key-save" onclick="saveApiKey('${provider.id}')">💾</button>
+                            ${hasKey ? `<button class="api-key-delete" onclick="deleteApiKey('${provider.id}')">🗑️</button>` : ''}
+                        </div>
+                        <div class="api-key-note">Modelos: ${provider.models.join(', ')}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            modal.classList.add('active');
+        }
+
+        function closeApiModal() {
+            document.getElementById('apiModal').classList.remove('active');
+        }
+
+        function saveApiKey(providerId) {
+            const input = document.getElementById(`key-${providerId}`);
+            const key = input.value.trim();
+            
+            if (!key) {
+                showToast('Introduce una API Key válida', 'error');
+                return;
+            }
+            
+            apiKeys[providerId] = key;
+            localStorage.setItem('aiArenaApiKeys', JSON.stringify(apiKeys));
+            saveUserData(); // Sync with user account
+            
+            showToast('API Key guardada correctamente', 'success');
+            openApiModal();
+            renderModels();
+        }
+
+        function deleteApiKey(providerId) {
+            delete apiKeys[providerId];
+            localStorage.setItem('aiArenaApiKeys', JSON.stringify(apiKeys));
+            saveUserData(); // Sync with user account
+            
+            showToast('API Key eliminada', 'info');
+            openApiModal();
+            renderModels();
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = { success: '✓', error: '✗', info: 'ℹ' };
+            toast.innerHTML = `<span style="font-size: 1.25rem;">${icons[type]}</span><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
