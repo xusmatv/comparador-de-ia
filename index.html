@@ -66,109 +66,102 @@
 
 <!-- ========================================================= -->
 <script>
-/* ---------- URLs públicas (sin token) ---------------------- */
+/* ---------- 1️⃣ URLs públicas (sin token) ---------- */
 const IF_RAMES = {
-  hart:    {url:"https://replicate.com/chenxwh/hart?embed=true",
-           name:"HART (Replicate)"},
-  sd:      {url:"https://stabilityai-stable-diffusion.hf.space",
-           name:"Stable‑Diffusion 2‑1"},
-  pixart:  {url:"https://pixart-alpha-pixart-alpha.hf.space",
-           name:"PixArt‑α"},
-  sdxl:    {url:"https://stabilityai-sdxl-turbo.hf.space",
-           name:"SD‑XL‑Turbo"}
+  hart:    {url:"https://replicate.com/chenxwh/hart?embed=true",   name:"HART (Replicate)"},
+  sd:      {url:"https://stabilityai-stable-diffusion-2-1.hf.space",name:"Stable‑Diffusion 2‑1"},
+  pixart:  {url:"https://pixart-alpha-pixart-alpha.hf.space",  name:"PixArt‑α"},
+  sdxl:    {url:"https://stabilityai-sdxl-turbo.hf.space",    name:"SD‑XL‑Turbo"},
+  // ----------------- Añade aquí más modelos -----------------
+  sd3_5:   {url:"https://stabilityai-stable-diffusion-3-5-large.hf.space", name:"Stable‑Diffusion 3.5 Large"},
+  // …
 };
 
-/* ---------- Embeds (iframes) + cronómetro ---------------- */
-async function embedIframe(key,prompt,size){
-  const container=document.createElement('div'); container.className='result';
-  const title=document.createElement('h3'); title.textContent=IF_RAMES[key].name;
+/* ---------- 2️⃣ Embed iframe (para todos los Spaces) ---------- */
+async function embedIframe(key, prompt, size){
+  const container = document.createElement('div'); container.className='result';
+  const title = document.createElement('h3'); title.textContent = IF_RAMES[key].name;
   container.appendChild(title);
-
-  const [w,h]=size.split('x');
-  const src=`${IF_RAMES[key].url}?prompt=${encodeURIComponent(prompt)}&width=${w}&height=${h}`;
-  const iframe=document.createElement('iframe');
-  iframe.src = src;
-  iframe.style.width = '100%';
-  iframe.style.height = '620px';
-  iframe.setAttribute('loading','lazy');
-  iframe.setAttribute('allowfullscreen','');
+  const [w, h] = size.split('x');
+  const src = `${IF_RAMES[key].url}?prompt=${encodeURIComponent(prompt)}&width=${w}&height=${h}`;
+  const iframe = document.createElement('iframe');
+  iframe.src = src; iframe.style.width='100%'; iframe.style.height='620px';
+  iframe.setAttribute('loading','lazy'); iframe.setAttribute('allowfullscreen','');
   container.appendChild(iframe);
   document.getElementById('results').appendChild(container);
 }
 
-/* ---------- Pollinations (sin clave) ---------------------- */
+/* ---------- 3️⃣ Pollinations (fallback gratuito) ---------- */
 async function pollinationsGenerate(prompt,size){
   const [w,h]=size.split('x');
   const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true`;
   const start=performance.now();
   const resp=await fetch(url);
-  if(!resp.ok) throw new Error('Pollinations error');
   const blob=await resp.blob();
   const img=URL.createObjectURL(blob);
   const t=((performance.now()-start)/1000).toFixed(2);
-
   const card=document.createElement('div'); card.className='result';
   card.innerHTML = `<h3>Pollinations (free fallback)</h3>
                     <img src="${img}" style="max-width:100%;border-radius:.4rem;">
                     <p>⏱ Tiempo: <strong>${t}s</strong></p>
                     <a href="${img}" download="pollinations.png"
-                       class="btn-download" style="margin-top:.5rem;display:inline-block;">
-                      <i class="fas fa-download"></i> Descargar</a>`;
+                       class="btn-download"><i class="fas fa-download"></i> Descargar</a>`;
   document.getElementById('results').appendChild(card);
 }
 
-/* ---------- DALL·E 3 (requiere clave) – OPCIONAL --------- */
-const OPENAI_KEY = "";   // ← pon aquí tu API‑key de OpenAI si la tienes
+/* ---------- 4️⃣ DALL·E 3 (pago) ---------- */
+const OPENAI_KEY = "";   // <-- pon tu clave si la tienes
 async function openAIDALLE3(prompt,size){
   if(!OPENAI_KEY) return;
   const [w,h]=size.split('x');
   const start=performance.now();
-  const resp=await fetch('https://api.openai.com/v1/images/generations',{
+  const resp = await fetch('https://api.openai.com/v1/images/generations',{
     method:'POST',
-    headers:{'Authorization':`Bearer ${OPENAI_KEY}`,
-             'Content-Type':'application/json'},
+    headers:{'Authorization':`Bearer ${OPENAI_KEY}`,'Content-Type':'application/json'},
     body:JSON.stringify({model:'dall-e-3',prompt,size:`${w}x${h}`})
   });
-  if(!resp.ok) throw new Error('OpenAI error');
-  const data=await resp.json();
-  const img=data.data[0].url;
+  const data = await resp.json();
+  const img = data.data[0].url;
   const t=((performance.now()-start)/1000).toFixed(2);
   const card=document.createElement('div'); card.className='result';
-  card.innerHTML = `<h3>DALL·E 3 (OpenAI ‑ pago)</h3>
+  card.innerHTML = `<h3>DALL·E 3 (OpenAI‑pago)</h3>
                     <img src="${img}" style="max-width:100%;border-radius:.4rem;">
                     <p>⏱ Tiempo: <strong>${t}s</strong></p>
                     <a href="${img}" download="dalle3.png"
-                       class="btn-download" style="margin-top:.5rem;display:inline-block;">
-                      <i class="fas fa-download"></i> Descargar</a>`;
+                       class="btn-download"><i class="fas fa-download"></i> Descargar</a>`;
   document.getElementById('results').appendChild(card);
 }
 
-/* ---------- Botón “Generar” ------------------------------- */
+/* ---------- 5️⃣ Botón “Generar” (orquesta todo) ---------- */
 document.getElementById('genBtn').onclick = async () => {
   const prompt = document.getElementById('prompt').value.trim();
+  const size   = document.getElementById('size').value;
   if(!prompt){ alert('Introduce un prompt'); return; }
-  const size = document.getElementById('size').value;
 
-  // limpiar resultados y mostrar spinner
   document.getElementById('results').innerHTML = '';
   document.getElementById('loader').style.display = 'block';
 
   const jobs = [];
-  if(document.getElementById('m_hart').checked)   jobs.push(embedIframe('hart',prompt,size));
-  if(document.getElementById('m_sd').checked)    jobs.push(embedIframe('sd',prompt,size));
-  if(document.getElementById('m_pixart').checked)jobs.push(embedIframe('pixart',prompt,size));
-  if(document.getElementById('m_sdxl').checked)  jobs.push(embedIframe('sdxl',prompt,size));
-  if(document.getElementById('m_dalle').checked)jobs.push(openAIDALLE3(prompt,size));
-  jobs.push(pollinationsGenerate(prompt,size));   // siempre se ejecuta
+  // Cada modelo que tenga el checkbox marcado se agrega aquí:
+  if(document.getElementById('m_hart').checked)    jobs.push(embedIframe('hart',prompt,size));
+  if(document.getElementById('m_sd').checked)      jobs.push(embedIframe('sd',prompt,size));
+  if(document.getElementById('m_pixart').checked)  jobs.push(embedIframe('pixart',prompt,size));
+  if(document.getElementById('m_sdxl').checked)    jobs.push(embedIframe('sdxl',prompt,size));
+  // ejemplo: modelo nuevo
+  if(document.getElementById('m_sd3_5').checked)    jobs.push(embedIframe('sd3_5',prompt,size));
+  // DALL·E 3 opcional
+  if(document.getElementById('m_dalle').checked)   jobs.push(openAIDALLE3(prompt,size));
+  // fallback siempre
+  jobs.push(pollinationsGenerate(prompt,size));
 
   await Promise.all(jobs);
   document.getElementById('loader').style.display = 'none';
 };
 
-/* ---------- Gradio (necesario para los HF Spaces) -------- */
-const gradioScript = document.createElement('script');
-gradioScript.src = "https://gradio.app/js/gradio.js";
-document.head.appendChild(gradioScript);
+/* ---------- 6️⃣ Gradio (necesario para HF Spaces) ---------- */
+const g = document.createElement('script');
+g.src = "https://gradio.app/js/gradio.js";
+document.head.appendChild(g);
 </script>
 </body>
 </html>
