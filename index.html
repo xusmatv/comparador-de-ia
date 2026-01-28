@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Comparador IA – HART vs Modelos Gratis</title>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  body{font-family:system-ui,sans-serif;background:#fafafa;padding:2rem}
+  .container{max-width:1100px;margin:auto}
+  textarea{width:100%;height:100px;padding:.6rem;font-size:1rem}
+  .models{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;margin:1rem 0}
+  .model{display:flex;align-items:center}
+  .model input{margin-right:.4rem}
+  .result{border:1px solid #ddd;padding:.8rem;margin-top:1rem;border-radius:.4rem;background:#fff}
+  .spinner{border:4px solid #eee;border-top:4px solid #667eea;border-radius:50%;width:36px;height:36px;animation:spin 1s linear infinite;margin:auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔄 Comparador IA – HART vs Modelos Gratis</h1>
+
+  <label for="prompt">📝 Prompt (español o inglés)</label>
+  <textarea id="prompt"
+    placeholder="Ej.: un astronauta montado en un caballo sobre la luna, estilo Van Gogh"></textarea>
+
+  <div class="models">
+    <div class="model"><input type="checkbox" id="m_hart" checked>
+      <label for="m_hart">HART (Replicate)</label></div>
+    <div class="model"><input type="checkbox" id="m_sd" checked>
+      <label for="m_sd">Stable‑Diffusion 2‑1 (HF‑Space)</label></div>
+    <div class="model"><input type="checkbox" id="m_pixart" checked>
+      <label for="m_pixart">PixArt‑α (HF‑Space)</label></div>
+    <div class="model"><input type="checkbox" id="m_sdxl" checked>
+      <label for="m_sdxl">SD‑XL‑Turbo (HF‑Space)</label></div>
+    <div class="model"><input type="checkbox" id="m_dalle">
+      <label for="m_dalle">DALL·E 3 (OpenAI‑pago)</label></div>
+  </div>
+
+  <label for="size">📏 Resolución</label>
+  <select id="size">
+    <option value="512x512">512 × 512 (rápido)</option>
+    <option value="1024x1024" selected>1024 × 1024 (alta calidad)</option>
+  </select>
+
+  <br><br>
+  <button id="genBtn"
+    style="padding:.6rem 1rem;font-size:1rem;background:#667eea;color:#fff;border:none;border-radius:.4rem;cursor:pointer">
+    🚀 Generar
+  </button>
+  <div id="loader" class="spinner" style="display:none;margin-top:1rem"></div>
+
+  <div id="results"></div>
+</div>
+
+<script>
+/* -----------------------------------------------------------------
+   URLs públicas (sin token) – iframes
+   ----------------------------------------------------------------- */
+const IF_RAMES = {
+  hart:    {url:"https://replicate.com/chenxwh/hart?embed=true",    name:"HART (Replicate)"},
+  sd:      {url:"https://huggingface.co/spaces/stabilityai/stable-diffusion?iframe=true", name:"Stable‑Diffusion 2‑1"},
+  pixart: {url:"https://huggingface.co/spaces/pixart-alpha/pixart-alpha?iframe=true",          name:"PixArt‑α"},
+  sdxl:   {url:"https://huggingface.co/spaces/stabilityai/sdxl-turbo?iframe=true",             name:"SD‑XL‑Turbo"}
+};
+
+/* -----------------------------------------------------------------
+   Embed iframe + cronómetro
+   ----------------------------------------------------------------- */
+async function embedIframe(key,prompt,size){
+  const container=document.createElement('div'); container.className='result';
+  const h=document.createElement('h3'); h.textContent=IF_RAMES[key].name; container.appendChild(h);
+  const [w,hgt]=size.split('x');
+  const src=`${IF_RAMES[key].url}&prompt=${encodeURIComponent(prompt)}&width=${w}&height=${hgt}`;
+  const iframe=document.createElement('iframe');
+  iframe.src=src; iframe.style.width='100%'; iframe.style.height='620px';
+  iframe.setAttribute('loading','lazy'); iframe.setAttribute('allowfullscreen','');
+  container.appendChild(iframe);
+  document.getElementById('results').appendChild(container);
+}
+
+/* -----------------------------------------------------------------
+   Pollinations (sin clave)
+   ----------------------------------------------------------------- */
+async function pollinationsGenerate(prompt,size){
+  const [w,h]=size.split('x');
+  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&nologo=true`;
+  const start=performance.now();
+  const resp=await fetch(url);
+  if(!resp.ok) throw new Error('Pollinations error');
+  const blob=await resp.blob();
+  const img=URL.createObjectURL(blob);
+  const t=((performance.now()-start)/1000).toFixed(2);
+  const card=document.createElement('div'); card.className='result';
+  card.innerHTML=`<h3>Pollinations (free fallback)</h3>
+                  <img src="${img}" style="max-width:100%;border-radius:.4rem;">
+                  <p>⏱ Tiempo: <strong>${t}s</strong></p>
+                  <a href="${img}" download="pollinations.png"
+                     class="btn-download" style="margin-top:.5rem;display:inline-block;">
+                     <i class="fas fa-download"></i> Descargar</a>`;
+  document.getElementById('results').appendChild(card);
+}
+
+/* -----------------------------------------------------------------
+   DALL·E 3 (requiere clave) – OPCIONAL
+   ----------------------------------------------------------------- */
+const OPENAI_KEY = "";   // ← pon tu clave aquí si la tienes
+async function openAIDALLE3(prompt,size){
+  if(!OPENAI_KEY) return;   // si no hay clave, no hacemos nada
+  const [w,h]=size.split('x');
+  const start=performance.now();
+  const resp=await fetch('https://api.openai.com/v1/images/generations',{
+    method:'POST',
+    headers:{'Authorization':`Bearer ${OPENAI_KEY}`,'Content-Type':'application/json'},
+    body:JSON.stringify({model:'dall-e-3',prompt, size:`${w}x${h}`})
+  });
+  if(!resp.ok) throw new Error('OpenAI error');
+  const data=await resp.json();
+  const img=data.data[0].url;
+  const t=((performance.now()-start)/1000).toFixed(2);
+  const card=document.createElement('div'); card.className='result';
+  card.innerHTML=`<h3>DALL·E 3 (OpenAI ‑ pago)</h3>
+                  <img src="${img}" style="max-width:100%;border-radius:.4rem;">
+                  <p>⏱ Tiempo: <strong>${t}s</strong></p>
+                  <a href="${img}" download="dalle3.png"
+                     class="btn-download" style="margin-top:.5rem;display:inline-block;">
+                     <i class="fas fa-download"></i> Descargar</a>`;
+  document.getElementById('results').appendChild(card);
+}
+
+/* -----------------------------------------------------------------
+   Botón “Generar”
+   ----------------------------------------------------------------- */
+document.getElementById('genBtn').onclick=async()=>{
+  const prompt=document.getElementById('prompt').value.trim();
+  if(!prompt){ alert('Introduce un prompt'); return; }
+  const size=document.getElementById('size').value;
+  document.getElementById('results').innerHTML='';
+  document.getElementById('loader').style.display='block';
+
+  const jobs=[];
+  if(document.getElementById('m_hart').checked)   jobs.push(embedIframe('hart',prompt,size));
+  if(document.getElementById('m_sd').checked)     jobs.push(embedIframe('sd',prompt,size));
+  if(document.getElementById('m_pixart').checked) jobs.push(embedIframe('pixart',prompt,size));
+  if(document.getElementById('m_sdxl').checked)   jobs.push(embedIframe('sdxl',prompt,size));
+  if(document.getElementById('m_dalle').checked)  jobs.push(openAIDALLE3(prompt,size));
+  jobs.push(pollinationsGenerate(prompt,size));   // siempre se ejecuta
+
+  await Promise.all(jobs);
+  document.getElementById('loader').style.display='none';
+};
+</script>
+</body>
+</html>
